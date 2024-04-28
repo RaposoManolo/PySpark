@@ -1,0 +1,28 @@
+pip install requests
+pip install pyspark 
+
+# Downloading pyspark-3.5.1.tar.gz (317.0 MB)
+import requests 
+
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StringType, StructType, StructField, DoubleType
+
+# Create a spark session
+spark = SparkSession.builder.appName("IMR Stock Analysis").getOrCreate()
+
+# Define function to get data from API 
+def get_StockData(stock, apiKey):
+  stockIncomeStatementUrl =f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={stock}&apikey={apiKey}"
+  response = requests.get(stockIncomeStatementUrl)
+  data = response.json()[stock + " Income Statement"]
+  return data
+
+# API key for Alpha Vantage
+apiKey = "abcd"
+
+# Get data for a specific stock
+stock = "OZK"
+data = get_StockData(stock, apiKey)
+
+# create df
+df = spark.createDataFrame(data)
